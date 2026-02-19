@@ -1,0 +1,40 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEP — MQ_01</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head><body>
+  <div class="header"><h1>CEP — MQ_01</h1><nav><a href="../analise.html">Voltar</a></nav></div>
+  <div class="container">
+    <div class="card">
+      <h3>Dados (amostras)</h3>
+      <textarea id="nums" placeholder="Cole medições separadas por vírgula, espaço ou quebra de linha"></textarea>
+      <button id="plot" class="btn">Plotar CEP</button>
+    </div>
+    <div class="card"><canvas id="cv"></canvas></div>
+    <div class="muted" id="info"></div>
+  </div>
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+  <script>
+    let chart;
+    function parseNums(t){ return (t||'').split(/[\s,;]+/).map(x=>+x).filter(x=>!isNaN(x)); }
+    function mean(a){ return a.reduce((s,x)=>s+x,0)/a.length; }
+    function stdev(a){ const m=mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1)); }
+    document.getElementById('plot').onclick=()=>{
+      const y=parseNums(nums.value); if(y.length<3) return alert('Informe pelo menos 3 medições');
+      const m=mean(y), sd=stdev(y); const UCL=m+3*sd, LCL=m-3*sd;
+      const labels=y.map((_,i)=>String(i+1));
+      const ctx=document.getElementById('cv').getContext('2d'); if(chart) chart.destroy();
+      chart=new Chart(ctx,{type:'line',data:{labels,
+        datasets:[
+          {label:'Medições',data:y,borderColor:'#3b82f6',tension:.15},
+          {label:'Média',data:y.map(()=>m),borderColor:'#10b981',borderDash:[6,6]},
+          {label:'UCL (+3σ)',data:y.map(()=>UCL),borderColor:'#ef4444',borderDash:[4,4]},
+          {label:'LCL (-3σ)',data:y.map(()=>LCL),borderColor:'#ef4444',borderDash:[4,4]}
+        ]},
+        options:{scales:{y:{beginAtZero:false}},plugins:{legend:{position:'bottom'}}}
+      });
+      info.textContent = `Média=${m.toFixed(4)} | Desvio=${sd.toFixed(4)} | UCL=${UCL.toFixed(4)} | LCL=${LCL.toFixed(4)}`;
+    };
+  </script>
+</body></html>
