@@ -1,0 +1,59 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - MQ_01</title>
+<link rel="stylesheet" href="./assets/style.css">
+</head><body>
+  <div class="header">
+    <h1>📊 Dashboard — MQ_01</h1>
+    <nav>
+      <a href="./index.html">Dashboard</a>
+      <a href="./fabrica.html">Fábrica</a>
+      <a href="./tv.html">TV</a>
+      <a href="./acoes.html">Ações</a>
+      <a href="./analise.html">Análises</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="kpi">
+      <div class="card"><b>Abertos</b><div id="k_abertos" class="muted">-</div></div>
+      <div class="card"><b>Fechados</b><div id="k_fechados" class="muted">-</div></div>
+      <div class="card"><b>Próximo prazo</b><div id="k_prazo" class="muted">-</div></div>
+    </div>
+
+    <h3>Histórico Recente</h3>
+    <div id="historico"></div>
+  </div>
+
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+
+  <script>
+    const DATA_BASE = "../Setor%20-XY/MQ_01";
+    async function carrega(){
+      try{
+        const r = await fetch(`${DATA_BASE}/dados.json`); const data = await r.json();
+        const hist = data.historico||[];
+        // KPIs
+        const abertos = hist.filter(h=>h.status==='Aberto').length;
+        const fechados = hist.filter(h=>h.status==='Fechado').length;
+        const proximos = hist.map(h=>h.prazo).filter(Boolean).sort()[0]||'-';
+        k_abertos.textContent = abertos;
+        k_fechados.textContent = fechados;
+        k_prazo.textContent = proximos;
+
+        // Lista
+        historico.innerHTML = '';
+        hist.slice(-10).reverse().forEach(h=>{
+          const vencido = (h.status==='Aberto' && h.prazo && new Date(h.prazo) < new Date());
+          historico.insertAdjacentHTML('beforeend', `
+            <div class="card" style="border-left:4px solid ${vencido?'#dc2626':'#1e40af'}">
+              <b>${h.data||'-'}</b> — ${h.descricao||'-'} — ${h.status||'-'} ${h.prazo?('— Prazo: '+h.prazo):''}
+            </div>`);
+        });
+      }catch(e){
+        historico.innerHTML = '<div class="card">Não foi possível carregar dados.json</div>';
+      }
+    }
+    carrega();
+  </script>
+</body></html>
