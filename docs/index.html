@@ -1,26 +1,49 @@
 <!doctype html><html lang="pt-br">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard - Máquina</title>
+<title>Industrial Suite Mobile</title>
 <link rel="stylesheet" href="assets/style.css">
-<script type="module">
-  import {Api} from './js/app.js';
-  window.addEventListener('DOMContentLoaded', ()=>{
-    const d = Api.getDados();
-    const cont = document.getElementById('historico');
-    d.historico.forEach(h=>{
-      const vencido = (h.status==='Aberto' && new Date(h.prazo) < new Date());
-      cont.insertAdjacentHTML('beforeend', `
-        <div class="card" style="border-left:4px solid ${vencido?'#dc2626':'#1e40af'}">
-          <b>${h.data}</b> — ${h.descricao} — ${h.status}${h.prazo?` — Prazo: ${h.prazo}`:''}
-        </div>`);
-    });
-  });
-</script>
 </head>
 <body>
-  <div class="header"><h1>📊 Dashboard - MQ_Tox_Perf</h1>
-    <nav><a href="./index.html">Dashboard</a><a href="./acoes.html">Ações</a><a href="./analise.html">Análises</a></nav>
+  <div class="header">
+    <h1>🏭 Industrial Suite Mobile</h1>
+    <div class="muted">Escolha uma máquina para visualizar o Dashboard, Ações e Análises</div>
   </div>
-  <div class="container"><div id="historico"></div></div>
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h3>Máquina 1</h3>
+        <p class="muted">Área de teste 1</p>
+        <p>
+          <a class="btn" href="./dashboard.html?m=1">Dashboard</a>
+        </p>
+        <p>
+          <a class="btn" href="./acoes.html?m=1">Ações</a>
+          <a class="btn" style="margin-left:.5rem" href="./analise.html?m=1">Análises</a>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Máquina 2</h3>
+        <p class="muted">Área de teste 2</p>
+        <p>
+          <a class="btn" href="./dashboard.html?m=2">Dashboard</a>
+        </p>
+        <p>
+          <a class="btn" href="./acoes.html?m=2">Ações</a>
+          <a class="btn" style="margin-left:.5rem" href="./analise.html?m=2">Análises</a>
+        </p>
+      </div>
+      <div class="card">
+        <h3>Máquina 3</h3>
+        <p class="muted">Área de teste 3</p>
+        <p>
+          <a class="btn" href="./dashboard.html?m=3">Dashboard</a>
+        </p>
+        <p>
+          <a class="btn" href="./acoes.html?m=3">Ações</a>
+          <a class="btn" style="margin-left:.5rem" href="./analise.html?m=3">Análises</a>
+        </p>
+      </div>
+    </div>
+  </div>
 </body></html>
