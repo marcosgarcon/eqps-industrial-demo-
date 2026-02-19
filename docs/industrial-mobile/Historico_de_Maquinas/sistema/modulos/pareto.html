@@ -1,0 +1,52 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pareto — MQ_01</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head><body>
+  <div class="header">
+    <h1>Pareto — MQ_01</h1>
+    <nav><a href="../analise.html">Voltar</a></nav>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h3>Novo Item</h3>
+      <input id="causa" placeholder="Causa/Problema">
+      <input id="freq" type="number" min="0" placeholder="Frequência">
+      <button id="add" class="btn">Adicionar</button>
+    </div>
+    <div class="card"><canvas id="cv"></canvas></div>
+    <div class="card"><div id="list"></div></div>
+  </div>
+
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+
+  <script>
+    const LS='Analise_Pareto_MQ_01'; let chart;
+    function data(){ return JSON.parse(localStorage.getItem(LS)||'[]'); }
+    function salvar(arr){ localStorage.setItem(LS, JSON.stringify(arr)); }
+    function render(){
+      const arr = data().sort((a,b)=>(+b.frequencia)-(+a.frequencia));
+      document.getElementById('list').innerHTML = arr.map((x,i)=>`
+        <div class="card" style="margin:.5rem 0;display:flex;justify-content:space-between;align-items:center">
+          <div>${x.causa} — <b>${x.frequencia}</b></div>
+          <div>
+            <button class="btn btn-warn" onclick="editar(${i})">Editar</button>
+            <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button>
+          </div>
+        </div>
+      `).join('') || '<i>Nenhum item.</i>';
+      const labels = arr.map(x=>x.causa), values = arr.map(x=>+x.frequencia||0);
+      const ctx = document.getElementById('cv').getContext('2d'); if(chart) chart.destroy();
+      chart = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Frequência',data:values,backgroundColor:'rgba(59,130,246,.85)'}]},options:{scales:{y:{beginAtZero:true}}}});
+    }
+    document.getElementById('add').onclick=()=>{
+      if(!causa.value || !freq.value) return alert('Preencha causa e frequência');
+      const arr=data(); arr.push({causa:causa.value,frequencia:+freq.value}); salvar(arr); causa.value=''; freq.value=''; render();
+    };
+    window.excluir=(i)=>{const arr=data(); arr.splice(i,1); salvar(arr); render(); }
+    window.editar=(i)=>{const arr=data(); const novo=prompt('Edite (JSON):', JSON.stringify(arr[i],null,2)); if(novo){try{arr[i]=JSON.parse(novo); salvar(arr); render();}catch(e){alert('JSON inválido')}}}
+    render();
+  </script>
+</body></html>
