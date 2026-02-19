@@ -1,0 +1,41 @@
+<!doctype html><html lang="pt-br">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - Máquina</title>
+<link rel="stylesheet" href="assets/style.css">
+<script type="module">
+  import {Api, machineLabel, withM} from './js/app.js';
+  window.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('nomeMaquina').textContent = machineLabel();
+    // Nav preservando ?m=
+    lnkDash.href = withM('./dashboard.html');
+    lnkAcoes.href = withM('./acoes.html');
+    lnkAnalise.href = withM('./analise.html');
+
+    const d = Api.getDados();
+    const cont = document.getElementById('historico');
+    cont.innerHTML = '';
+    d.historico.forEach(h=>{
+      const vencido = (h.status==='Aberto' && new Date(h.prazo) < new Date());
+      cont.insertAdjacentHTML('beforeend', `
+        <div class="card" style="border-left:4px solid ${vencido?'#dc2626':'#1e40af'}">
+          <b>${h.data}</b> — ${h.descricao} — ${h.status}${h.prazo?` — Prazo: ${h.prazo}`:''}
+        </div>`);
+    });
+  });
+</script>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 Dashboard — <span id="nomeMaquina"></span></h1>
+    <nav>
+      <a id="lnkDash" href="#">Dashboard</a>
+      <a id="lnkAcoes" href="#">Ações</a>
+      <a id="lnkAnalise" href="#">Análises</a>
+      <a href="./index.html" style="margin-left:1rem">Trocar máquina</a>
+    </nav>
+  </div>
+  <div class="container">
+    <div id="historico"></div>
+  </div>
+</body></html>
