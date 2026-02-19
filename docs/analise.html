@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="assets/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  import {Api} from './js/app.js';
+  import {Api, machineLabel, withM} from './js/app.js';
   let ferramenta = '', lista = []; let chart;
 
   function ui(){ 
@@ -83,20 +83,28 @@
     if(novo){ try{ it.dados = JSON.parse(novo); const all=Api.getAnalises(); const idx = all.findIndex(x=>x.id===it.id); all[idx]=it; Api.setAnalises(all); carregar(); }catch(e){ alert('JSON inválido'); } }
   };
 
-  function carregar(){
-    lista = Api.getAnalises().filter(x=>x.tipo===ferramenta);
-    render();
-  }
+  function carregar(){ lista = Api.getAnalises().filter(x=>x.tipo===ferramenta); render(); }
 
   window.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('titulo').textContent = `🔍 Análises — ${machineLabel()}`;
+    lnkDash.href = withM('./dashboard.html');
+    lnkAcoes.href = withM('./acoes.html');
+    lnkAnalise.href = withM('./analise.html');
+
     const sel = document.getElementById('ferramenta');
     sel.onchange = ()=>{ ferramenta = sel.value; ui(); carregar(); };
   });
 </script>
 </head>
 <body>
-  <div class="header"><h1>🔍 Análises - MQ_Tox_Perf</h1>
-    <nav><a href="./index.html">Dashboard</a><a href="./acoes.html">Ações</a><a href="./analise.html">Análises</a></nav>
+  <div class="header">
+    <h1 id="titulo">🔍 Análises</h1>
+    <nav>
+      <a id="lnkDash" href="#">Dashboard</a>
+      <a id="lnkAcoes" href="#">Ações</a>
+      <a id="lnkAnalise" href="#">Análises</a>
+      <a href="./index.html" style="margin-left:1rem">Trocar máquina</a>
+    </nav>
   </div>
   <div class="container">
     <select id="ferramenta">
