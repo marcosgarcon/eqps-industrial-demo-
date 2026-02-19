@@ -1,0 +1,110 @@
+<!doctype html><html lang="pt-br">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análises</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  import {Api} from './js/app.js';
+  let ferramenta = '', lista = []; let chart;
+
+  function ui(){ 
+    const c = document.getElementById('ui'); 
+    if(!ferramenta){ c.innerHTML=''; return; }
+    let f = '';
+    if(ferramenta==='fmea'){
+      f = `<input id=p placeholder='Processo/Item'><input id=f placeholder='Modo de Falha'><input id=e placeholder='Efeito'><input id=c placeholder='Causa'>
+           <div style='display:flex;gap:.5rem'><input id=s type=number min=1 max=10 placeholder='Severidade'><input id=o type=number min=1 max=10 placeholder='Ocorrência'><input id=d type=number min=1 max=10 placeholder='Detecção'></div>`;
+    }else if(ferramenta==='pareto'){
+      f = `<input id=cau placeholder='Causa/Problema'><input id=freq type=number placeholder='Frequência'>`;
+    }else if(ferramenta==='5porques'){
+      f = `<textarea id=prob placeholder='Problema'></textarea><input id=p1 placeholder='Por que 1'><input id=p2 placeholder='Por que 2'><input id=p3 placeholder='Por que 3'><input id=p4 placeholder='Por que 4'><input id=cr placeholder='Causa raiz'>`;
+    }else{
+      f = `<textarea id=info placeholder='Informações'></textarea>`;
+    }
+    c.innerHTML = `<div class='card'><h3>+ ${ferramenta.toUpperCase()}</h3>${f}<button class='btn' id='add'>Adicionar</button></div><div id='list' class='card'></div>${(ferramenta==='pareto')?`<canvas id='cv'></canvas>`:''}`;
+    document.getElementById('add').onclick = add;
+    render();
+  }
+
+  function add(){
+    let item = {tipo:ferramenta, id:Date.now(), data:new Date().toISOString().slice(0,10), dados:{}};
+    if(ferramenta==='fmea'){
+      item.dados={processo:p.value, falha:f.value, efeito:e.value, causa:c.value, severidade:s.value, ocorrencia:o.value, deteccao:d.value};
+    }else if(ferramenta==='pareto'){
+      item.dados={causa:cau.value, frequencia:freq.value};
+    }else if(ferramenta==='5porques'){
+      item.dados={problema:prob.value, porque1:p1.value, porque2:p2.value, porque3:p3.value, porque4:p4.value, causa_raiz:cr.value};
+    }else{
+      item.dados={info:info.value};
+    }
+    const all = Api.getAnalises(); all.push(item); Api.setAnalises(all); carregar();
+  }
+
+  function render(){
+    const el = document.getElementById('list');
+    if(!lista.length){ el.innerHTML = '<i>Nenhum item.</i>'; if(chart){chart.destroy()} return; }
+    let h = `<table><thead><tr>`;
+    if(ferramenta==='fmea'){ h+=`<th>Processo</th><th>Falha</th><th>RPN</th><th>Data</th><th>Ações</th>`}
+    else if(ferramenta==='pareto'){ h+=`<th>Causa</th><th>Frequência</th><th>Data</th><th>Ações</th>`}
+    else if(ferramenta==='5porques'){ h+=`<th>Problema</th><th>Causa Raiz</th><th>Data</th><th>Ações</th>`}
+    else { h+=`<th>Info</th><th>Data</th><th>Ações</th>`}
+    h+=`</tr></thead><tbody>`;
+    lista.forEach((it,i)=>{
+      if(ferramenta==='fmea'){
+        const rpn = (+it.dados.severidade||0)*(+it.dados.ocorrencia||0)*(+it.dados.deteccao||0);
+        h+=`<tr><td>${it.dados.processo||'-'}</td><td>${it.dados.falha||'-'}</td><td>${rpn}</td><td>${it.data}</td>
+            <td><button class='btn btn-warn' onclick='editar(${i})'>Editar</button> <button class='btn btn-danger' onclick='excluir(${i})'>Excluir</button></td></tr>`;
+      }else if(ferramenta==='pareto'){
+        h+=`<tr><td>${it.dados.causa||'-'}</td><td>${it.dados.frequencia||0}</td><td>${it.data}</td>
+            <td><button class='btn btn-warn' onclick='editar(${i})'>Editar</button> <button class='btn btn-danger' onclick='excluir(${i})'>Excluir</button></td></tr>`;
+      }else if(ferramenta==='5porques'){
+        h+=`<tr><td>${it.dados.problema||'-'}</td><td>${it.dados.causa_raiz||'-'}</td><td>${it.data}</td>
+            <td><button class='btn btn-warn' onclick='editar(${i})'>Editar</button> <button class='btn btn-danger' onclick='excluir(${i})'>Excluir</button></td></tr>`;
+      }else{
+        h+=`<tr><td>${(it.dados.info||'').toString().slice(0,60)}</td><td>${it.data}</td>
+            <td><button class='btn btn-warn' onclick='editar(${i})'>Editar</button> <button class='btn btn-danger' onclick='excluir(${i})'>Excluir</button></td></tr>`;
+      }
+    });
+    h+='</tbody></table>'; el.innerHTML=h;
+
+    if(ferramenta==='pareto'){
+      const ctx = document.getElementById('cv').getContext('2d');
+      const data = [...lista].map(x=>({x:x.dados.causa, y:+x.dados.frequencia||0})).sort((a,b)=>b.y-a.y);
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, {type:'bar', data:{labels:data.map(d=>d.x), datasets:[{label:'Frequência', data:data.map(d=>d.y), backgroundColor:'rgba(59,130,246,.8)'}]}, options:{scales:{y:{beginAtZero:true}}}});
+    }
+  }
+
+  window.excluir = (i)=>{ if(confirm('Excluir?')){ const all=Api.getAnalises(); all.splice(all.findIndex(x=>x.id===lista[i].id),1); Api.setAnalises(all); carregar(); } };
+  window.editar = (i)=>{
+    const it = lista[i];
+    const novo = prompt('Edite o JSON dos dados:', JSON.stringify(it.dados, null, 2));
+    if(novo){ try{ it.dados = JSON.parse(novo); const all=Api.getAnalises(); const idx = all.findIndex(x=>x.id===it.id); all[idx]=it; Api.setAnalises(all); carregar(); }catch(e){ alert('JSON inválido'); } }
+  };
+
+  function carregar(){
+    lista = Api.getAnalises().filter(x=>x.tipo===ferramenta);
+    render();
+  }
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const sel = document.getElementById('ferramenta');
+    sel.onchange = ()=>{ ferramenta = sel.value; ui(); carregar(); };
+  });
+</script>
+</head>
+<body>
+  <div class="header"><h1>🔍 Análises - MQ_Tox_Perf</h1>
+    <nav><a href="./index.html">Dashboard</a><a href="./acoes.html">Ações</a><a href="./analise.html">Análises</a></nav>
+  </div>
+  <div class="container">
+    <select id="ferramenta">
+      <option value="">Selecione...</option>
+      <option value="5porques">5 Porquês</option>
+      <option value="fmea">FMEA</option>
+      <option value="pareto">Pareto</option>
+    </select>
+    <div id="ui"></div>
+  </div>
+</body></html>
