@@ -20,3 +20,16 @@ th,td{padding:.75rem;border-bottom:1px solid #eee;text-align:left}th{background:
 .muted{color:#6b7280;font-size:.92rem}
 .footer{padding:1rem;text-align:center;color:#6b7280}
 .badge{display:inline-block;background:#e5edff;color:#1e40af;border:1px solid #bcd0ff;border-radius:999px;padding:.1rem .5rem;font-size:.8rem}
+
+/* Tema escuro para páginas de TV */
+.theme-tv{background:#0b1225;color:#e5e7eb}
+.theme-tv a{color:#93c5fd}
+.theme-tv .header{background:#0b1225;color:#e5e7eb}
+.theme-tv .card{background:#111827;color:#e5e7eb;border:1px solid #1f2937}
+.theme-tv .muted{color:#9ca3af}
+.theme-tv table{background:#111827}
+.theme-tv th{background:#0f172a;color:#e5e7eb}
+.theme-tv td{border-bottom:1px solid #1f2937}
+/* Últimos eventos da TV: datas em azul e status destacados */
+.theme-tv .events .card b{color:#93c5fd}
+.theme-tv .events .card .status{font-weight:600}
