@@ -1,29 +1,37 @@
-const MACHINE = 'MQ_Tox_Perf';
-const K = (name) => `IM_${MACHINE}_${name}`;
+// Suporte multi-máquina via ?m=1|2|3
+const params = new URLSearchParams(location.search);
+export const MACHINE_ID = params.get('m') || '1';
+const K = (name) => `IM_M${MACHINE_ID}_${name}`;
+
+export const machineLabel = () => `Máquina ${MACHINE_ID}`;
+export const withM = (path) => `${path}?m=${MACHINE_ID}`;
 
 function load(key, fallback){ try{ return JSON.parse(localStorage.getItem(K(key))) ?? fallback }catch(e){ return fallback } }
 function save(key, data){ localStorage.setItem(K(key), JSON.stringify(data)); }
 
 export const Api = {
-  getDados(){ return load('dados', { maquina:MACHINE, historico: [] }); },
+  getDados(){ return load('dados', { maquina: machineLabel(), historico: [] }); },
   setDados(obj){ save('dados', obj); },
 
   getAcoes(){ return load('acoes', []); },
-  addAcao(item){ const a=this.getAcoes(); a.push(item); save('acoes', a); },
   updAcoes(arr){ save('acoes', arr); },
 
   getAnalises(){ return load('analise', []); },
-  addAnalise(item){ const x=this.getAnalises(); x.push(item); save('analise', x); },
   setAnalises(arr){ save('analise', arr); }
 };
 
-// Dados iniciais (só 1ª vez)
+// Seed por máquina (apenas 1ª vez dessa máquina)
 if(!localStorage.getItem(K('seeded'))){
-  Api.setDados({maquina:MACHINE, historico:[
-    {data:'2026-02-17', descricao:'Vazamento válvula V123', status:'Aberto', prazo:'2026-02-20'},
-    {data:'2026-02-16', descricao:'Troca de sensor', status:'Fechado', prazo:'2026-02-16'}
-  ]});
-  Api.updAcoes([{acao:'Trocar válvula V123', responsavel:'João', prazo:'2026-02-20', status:'Aberto'}]);
+  const hoje = new Date();
+  const d = (offset) => new Date(hoje.getTime()+offset*86400000).toISOString().slice(0,10);
+  Api.setDados({
+    maquina: machineLabel(),
+    historico: [
+      {data:d(-3), descricao:'Ocorrência registrada', status:'Aberto', prazo:d(1)},
+      {data:d(-5), descricao:'Troca preventiva de sensor', status:'Fechado', prazo:d(-5)}
+    ]
+  });
+  Api.updAcoes([{acao:'Verificar válvulas', responsavel:'Equipe', prazo:d(2), status:'Aberto'}]);
   Api.setAnalises([]);
-  localStorage.setItem(K('seeded'), '1');
+  localStorage.setItem(K('seeded'),'1');
 }
