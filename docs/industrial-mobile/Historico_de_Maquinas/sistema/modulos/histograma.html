@@ -1,0 +1,38 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Histograma — MQ_01</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head><body>
+  <div class="header"><h1>Histograma — MQ_01</h1><nav><a href="../analise.html">Voltar</a></nav></div>
+  <div class="container">
+    <div class="card">
+      <h3>Dados</h3>
+      <textarea id="nums" placeholder="Cole números separados por vírgula, espaço ou quebra de linha"></textarea>
+      <input id="bins" type="number" min="3" max="30" value="8" placeholder="Nº de classes (bins)">
+      <button id="plot" class="btn">Plotar</button>
+    </div>
+    <div class="card"><canvas id="cv"></canvas></div>
+  </div>
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+  <script>
+    let chart;
+    function parseNums(t){ return (t||'').split(/[\s,;]+/).map(x=>+x).filter(x=>!isNaN(x)); }
+    function hist(data, bins){
+      const min=Math.min(...data), max=Math.max(...data), w=(max-min)/bins;
+      const edges=Array.from({length:bins+1},(_,i)=>min+i*w);
+      const counts=Array(bins).fill(0);
+      data.forEach(v=>{
+        let idx=Math.floor((v-min)/w); if(idx>=bins) idx=bins-1; if(idx<0) idx=0; counts[idx]++;
+      });
+      const labels=counts.map((_,i)=>`${edges[i].toFixed(2)}–${edges[i+1].toFixed(2)}`);
+      return {labels, counts};
+    }
+    document.getElementById('plot').onclick=()=>{
+      const arr=parseNums(nums.value); if(!arr.length) return alert('Informe dados numéricos');
+      const b=Math.max(3, Math.min(30, +bins.value||8)); const h=hist(arr,b);
+      const ctx=document.getElementById('cv').getContext('2d'); if(chart) chart.destroy();
+      chart=new Chart(ctx,{type:'bar',data:{labels:h.labels,datasets:[{label:'Frequência',data:h.counts,backgroundColor:'rgba(16,185,129,.9)'}]},options:{scales:{y:{beginAtZero:true}}}});
+    };
+  </script>
+</body></html>
