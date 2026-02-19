@@ -1,0 +1,49 @@
+<!doctype html><html lang="pt-br">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano de Ação</title>
+<link rel="stylesheet" href="assets/style.css">
+<script type="module">
+  import {Api} from './js/app.js';
+  let acoes = [];
+  function render(){
+    const tb = document.getElementById('tb'); tb.innerHTML='';
+    acoes.forEach((a,i)=>{
+      tb.insertAdjacentHTML('beforeend', `
+        <tr>
+          <td>${a.acao}</td><td>${a.responsavel}</td><td>${a.prazo}</td><td>${a.status}</td>
+          <td>
+            <button class="btn btn-warn" onclick="editar(${i})">Editar</button>
+            <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button>
+          </td>
+        </tr>`);
+    });
+  }
+  window.editar = (i)=>{
+    const a = acoes[i];
+    acao.value=a.acao; responsavel.value=a.responsavel; prazo.value=a.prazo; status.value=a.status;
+    salvar.onclick=()=>{ acoes[i]={acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value}; Api.updAcoes(acoes); render(); limpar(); };
+  };
+  window.excluir = (i)=>{ if(confirm('Excluir?')){ acoes.splice(i,1); Api.updAcoes(acoes); render(); } };
+  function limpar(){ acao.value=''; responsavel.value=''; prazo.value=''; status.value='Aberto'; salvar.onclick=add; }
+  function add(){ if(acao.value && responsavel.value && prazo.value){ acoes.push({acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value}); Api.updAcoes(acoes); render(); limpar(); } }
+  window.addEventListener('DOMContentLoaded', ()=>{
+    acoes = Api.getAcoes(); render();
+    window.salvar = document.getElementById('salvar'); window.acao=acao; window.responsavel=responsavel; window.prazo=prazo; window.status=status; salvar.onclick=add;
+  });
+</script>
+</head>
+<body>
+  <div class="header"><h1>🎯 Plano de Ação</h1>
+    <nav><a href="./index.html">Dashboard</a><a href="./acoes.html">Ações</a><a href="./analise.html">Análises</a></nav>
+  </div>
+  <div class="container">
+    <div class="card">
+      <h3>+ Nova Ação</h3>
+      <input id="acao" placeholder="Descrição da ação"><input id="responsavel" placeholder="Responsável">
+      <input id="prazo" type="date"><select id="status"><option>Aberto</option><option>Em Andamento</option><option>Fechado</option></select>
+      <button id="salvar" class="btn">Adicionar</button>
+    </div>
+    <table><thead><tr><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb"></tbody></table>
+  </div>
+</body></html>
