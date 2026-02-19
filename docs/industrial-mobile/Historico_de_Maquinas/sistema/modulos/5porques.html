@@ -1,0 +1,56 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5 Porquês — MQ_01</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head><body>
+  <div class="header">
+    <h1>5 Porquês — MQ_01</h1>
+    <nav><a href="../analise.html">Voltar</a></nav>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h3>Novo Registro</h3>
+      <textarea id="prob" placeholder="Problema"></textarea>
+      <input id="p1" placeholder="Por que 1">
+      <input id="p2" placeholder="Por que 2">
+      <input id="p3" placeholder="Por que 3">
+      <input id="p4" placeholder="Por que 4">
+      <input id="cr" placeholder="Causa raiz">
+      <button id="add" class="btn">Adicionar</button>
+    </div>
+    <div class="card">
+      <h3>Registros</h3>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+
+  <script>
+    const LS='Analise_5P_MQ_01';
+    function render(){
+      const arr = JSON.parse(localStorage.getItem(LS)||'[]');
+      const el = document.getElementById('list'); if(!arr.length){el.innerHTML='<i>Nenhum item.</i>'; return;}
+      el.innerHTML = arr.map((it,i)=>`
+        <div class="card" style="margin:.5rem 0">
+          <b>${it.data}</b> — ${it.problema}<br>
+          1) ${it.p1}<br>2) ${it.p2}<br>3) ${it.p3}<br>4) ${it.p4}<br>
+          <b>Causa raiz:</b> ${it.causa_raiz}
+          <div style="margin-top:.5rem">
+            <button class="btn btn-warn" onclick="editar(${i})">Editar</button>
+            <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    document.getElementById('add').onclick=()=>{
+      const item={data:new Date().toISOString().slice(0,10), problema:prob.value, p1:p1.value, p2:p2.value, p3:p3.value, p4:p4.value, causa_raiz:cr.value};
+      const arr=JSON.parse(localStorage.getItem(LS)||'[]'); arr.push(item); localStorage.setItem(LS, JSON.stringify(arr));
+      prob.value=p1.value=p2.value=p3.value=p4.value=cr.value=''; render();
+    };
+    window.excluir=(i)=>{const arr=JSON.parse(localStorage.getItem(LS)||'[]'); arr.splice(i,1); localStorage.setItem(LS, JSON.stringify(arr)); render();}
+    window.editar=(i)=>{const arr=JSON.parse(localStorage.getItem(LS)||'[]'); const novo=prompt('Edite (JSON):', JSON.stringify(arr[i],null,2)); if(novo){try{arr[i]=JSON.parse(novo); localStorage.setItem(LS, JSON.stringify(arr)); render();}catch(e){alert('JSON inválido')}}}
+    render();
+  </script>
+</body></html>
