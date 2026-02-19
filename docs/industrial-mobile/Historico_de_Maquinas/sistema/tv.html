@@ -1,0 +1,51 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tela TV - MQ_01</title>
+<link rel="stylesheet" href="./assets/style.css">
+<style>
+  body{background:#0b1225;color:#e5e7eb}
+  .header{background:#0b1225}
+  .k{display:grid;grid-template-columns:1fr;gap:1rem}
+  @media(min-width:900px){.k{grid-template-columns:repeat(3,1fr)}}
+  .k .card{background:#111827;border:1px solid #1f2937}
+</style>
+</head><body>
+  <div class="header">
+    <h1>📺 TV — MQ_01</h1>
+    <nav><a href="./index.html">Voltar</a></nav>
+  </div>
+
+  <div class="container tv">
+    <div class="k">
+      <div class="card"><b>Abertos</b><div id="tv_abertos" style="font-size:2.4em">-</div></div>
+      <div class="card"><b>Atrasados</b><div id="tv_atraso" style="font-size:2.4em">-</div></div>
+      <div class="card"><b>Próximo prazo</b><div id="tv_prazo" style="font-size:2.4em">-</div></div>
+    </div>
+    <h3>Últimos eventos</h3>
+    <div id="tv_hist"></div>
+  </div>
+
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+
+  <script>
+    const DATA_BASE = "../Setor%20-XY/MQ_01";
+    async function tick(){
+      try{
+        const r = await fetch(`${DATA_BASE}/dados.json`, {cache:'no-store'}); const d = await r.json();
+        const hist = d.historico||[];
+        const abertos = hist.filter(h=>h.status==='Aberto').length;
+        const atrasados = hist.filter(h=>h.status==='Aberto' && h.prazo && new Date(h.prazo) < new Date()).length;
+        const prox = hist.map(h=>h.prazo).filter(Boolean).sort()[0]||'-';
+        tv_abertos.textContent = abertos;
+        tv_atraso.textContent = atrasados;
+        tv_prazo.textContent = prox;
+        tv_hist.innerHTML = '';
+        hist.slice(-6).reverse().forEach(h=>{
+          const color = (h.status==='Aberto')?'#f59e0b':'#10b981';
+          tv_hist.insertAdjacentHTML('beforeend', `<div class="card" style="border-left:6px solid ${color}"><b>${h.data}</b> — ${h.descricao} — ${h.status}</div>`);
+        });
+      }catch(e){ /* ignore */ }
+    }
+    tick(); setInterval(tick, 30000);
+  </script>
+</body></html>
