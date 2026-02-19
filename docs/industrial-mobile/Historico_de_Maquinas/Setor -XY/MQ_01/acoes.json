@@ -1,0 +1,4 @@
+[
+  { "acao": "Inspecionar linha de ar", "responsavel": "Equipe A", "prazo": "2026-02-21", "status": "Aberto" },
+  { "acao": "Comprar junta nova", "responsavel": "Compras", "prazo": "2026-02-22", "status": "Em Andamento" }
+]
