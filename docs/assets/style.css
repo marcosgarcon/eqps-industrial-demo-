@@ -1,12 +1,35 @@
-*{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f7fb;margin:0}
-.header{background:#1e40af;color:#fff;padding:1rem}nav a{color:#fff;margin-right:1rem;text-decoration:none}
-.container{max-width:1000px;margin:0 auto;padding:1rem}
+/* Industrial Mobile – tema único (mobile-first) */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f7fb;margin:0;color:#111827;line-height:1.45}
+a{color:#1e40af;text-decoration:none}a:hover{text-decoration:underline}
+.header{background:#1e40af;color:#fff;padding:1rem;position:sticky;top:0;z-index:10}
+.header h1{margin:0;font-size:1.35rem}
+nav a{color:#fff;margin-right:1rem}
+.container{max-width:1100px;margin:0 auto;padding:1rem}
 .grid{display:grid;grid-template-columns:1fr;gap:1rem}
-@media(min-width:680px){.grid{grid-template-columns:repeat(3,1fr)}}
-.card{background:#fff;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.btn{background:#3b82f6;color:#fff;border:none;padding:.7rem 1rem;border-radius:8px;cursor:pointer}
-.btn-warn{background:#f59e0b}.btn-danger{background:#dc2626}
-input,textarea,select{width:100%;padding:.7rem;margin:.4rem 0;border:1px solid #ddd;border-radius:8px}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:#fff;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.08);border:1px solid #e5e7eb}
+.kpi{display:flex;gap:1rem;flex-wrap:wrap}.kpi .card{flex:1;min-width:180px}
+.btn{background:#3b82f6;color:#fff;border:none;padding:.6rem 1rem;border-radius:8px;cursor:pointer}
+.btn-warn{background:#f59e0b}.btn-danger{background:#dc2626}.btn-ghost{background:transparent;color:#1e40af;border:1px solid #1e40af}
+input,textarea,select{width:100%;padding:.7rem;margin:.4rem 0;border:1px solid #ddd;border-radius:8px;background:#fff}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 th,td{padding:.75rem;border-bottom:1px solid #eee;text-align:left}th{background:#1e40af;color:#fff}
-.muted{color:#6b7280;font-size:.9rem}
+.muted{color:#6b7280;font-size:.92rem}
+.footer{padding:1rem;text-align:center;color:#6b7280}
+.badge{display:inline-block;background:#e5edff;color:#1e40af;border:1px solid #bcd0ff;border-radius:999px;padding:.1rem .5rem;font-size:.8rem}
+
+/* Tema escuro para páginas de TV */
+.theme-tv{background:#0b1225;color:#e5e7eb}
+.theme-tv a{color:#93c5fd}
+.theme-tv .header{background:#0b1225;color:#e5e7eb}
+.theme-tv .card{background:#111827;color:#e5e7eb;border:1px solid #1f2937}
+.theme-tv .muted{color:#9ca3af}
+.theme-tv table{background:#111827}
+.theme-tv th{background:#0f172a;color:#e5e7eb}
+.theme-tv td{border-bottom:1px solid #1f2937}
+/* Últimos eventos da TV: datas em azul e status destacados */
+.theme-tv .events .card b{color:#93c5fd}
+.theme-tv .events .card .status{font-weight:600}
