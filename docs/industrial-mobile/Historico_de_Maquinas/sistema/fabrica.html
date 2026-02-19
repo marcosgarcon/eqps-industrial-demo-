@@ -1,0 +1,47 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel da Fábrica</title>
+<link rel="stylesheet" href="./assets/style.css">
+</head><body>
+  <div class="header">
+    <h1>🏭 Painel da Fábrica</h1>
+    <nav>
+      <a href="./index.html">Dashboard</a>
+      <a href="./fabrica.html">Fábrica</a>
+      <a href="./tv.html">TV</a>
+      <a href="./acoes.html">Ações</a>
+      <a href="./analise.html">Análises</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="grid" id="grid"></div>
+    <div class="muted">Para adicionar mais máquinas, crie novas pastas como “MQ_02”, “MQ_03” em “Setor -XY/”.</div>
+  </div>
+
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+
+  <script>
+    // Por ora, só MQ_01; adicione aqui novas máquinas quando criar as pastas
+    const maquinas = [{nome:'MQ_01', base:'../Setor%20-XY/MQ_01'}];
+    async function card(maquina){
+      try{
+        const r = await fetch(`${maquina.base}/dados.json`); const d = await r.json();
+        const hist = d.historico||[];
+        const abertos = hist.filter(h=>h.status==='Aberto').length;
+        const atrasos = hist.filter(h=>h.status==='Aberto' && h.prazo && new Date(h.prazo) < new Date()).length;
+        const prox = hist.map(h=>h.prazo).filter(Boolean).sort()[0]||'-';
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="card">
+            <h3>${maquina.nome}</h3>
+            <div class="muted">Abertos: ${abertos} • Atrasados: ${atrasos} • Próx. prazo: ${prox}</div>
+            <p><a class="btn" href="./index.html">Abrir Dashboard</a></p>
+          </div>
+        `);
+      }catch(e){
+        grid.insertAdjacentHTML('beforeend', `<div class="card"><h3>${maquina.nome}</h3><div class="muted">Sem dados</div></div>`);
+      }
+    }
+    maquinas.forEach(card);
+  </script>
+</body></html>
