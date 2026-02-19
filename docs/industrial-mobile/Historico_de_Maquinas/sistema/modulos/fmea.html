@@ -1,0 +1,53 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FMEA — MQ_01</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head><body>
+  <div class="header"><h1>FMEA — MQ_01</h1><nav><a href="../analise.html">Voltar</a></nav></div>
+  <div class="container">
+    <div class="card">
+      <h3>Novo item</h3>
+      <input id="proc" placeholder="Processo/Item">
+      <input id="falha" placeholder="Modo de Falha">
+      <input id="efeito" placeholder="Efeito">
+      <input id="causa" placeholder="Causa">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <input id="s" type="number" min="1" max="10" placeholder="Severidade">
+        <input id="o" type="number" min="1" max="10" placeholder="Ocorrência">
+        <input id="d" type="number" min="1" max="10" placeholder="Detecção">
+      </div>
+      <button id="add" class="btn">Adicionar</button>
+    </div>
+    <div class="card">
+      <h3>Itens</h3>
+      <table>
+        <thead><tr><th>Processo</th><th>Falha</th><th>RPN</th><th>Data</th><th>Ações</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
+  <script>
+    const LS='Analise_FMEA_MQ_01';
+    function lista(){ return JSON.parse(localStorage.getItem(LS)||'[]'); }
+    function save(a){ localStorage.setItem(LS, JSON.stringify(a)); }
+    function rpn(x){ return (+x.s||0)*(+x.o||0)*(+x.d||0); }
+    function render(){
+      const arr=lista(); const tb=document.getElementById('tb'); tb.innerHTML='';
+      arr.forEach((it,i)=>{
+        tb.insertAdjacentHTML('beforeend', `<tr>
+          <td>${it.processo||'-'}</td><td>${it.falha||'-'}</td><td>${rpn(it)}</td><td>${it.data}</td>
+          <td><button class="btn btn-warn" onclick="editar(${i})">Editar</button> <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button></td>
+        </tr>`);
+      });
+    }
+    document.getElementById('add').onclick=()=>{
+      const item={data:new Date().toISOString().slice(0,10), processo:proc.value, falha:falha.value, efeito:efeito.value, causa:causa.value, s:+s.value, o:+o.value, d:+d.value};
+      const arr=lista(); arr.push(item); save(arr);
+      proc.value=falha.value=efeito.value=causa.value=s.value=o.value=d.value=''; render();
+    };
+    window.excluir=(i)=>{const arr=lista(); arr.splice(i,1); save(arr); render();}
+    window.editar=(i)=>{const arr=lista(); const novo=prompt('Edite (JSON):', JSON.stringify(arr[i],null,2)); if(novo){try{arr[i]=JSON.parse(novo); save(arr); render();}catch(e){alert('JSON inválido')}}}
+    render();
+  </script>
+</body></html>
