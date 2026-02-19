@@ -1,13 +1,13 @@
 <!doctype html><html lang="pt-br"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Plano de Ação - MQ_01</title>
+<title>Plano de Ação — MQ_01</title>
 <link rel="stylesheet" href="./assets/style.css">
 </head><body>
   <div class="header">
     <h1>🎯 Plano de Ação — MQ_01</h1>
     <nav>
-      <a href="./index.html">Dashboard</a>
       <a href="./fabrica.html">Fábrica</a>
+      <a href="./index.html">Dashboard</a>
       <a href="./tv.html">TV</a>
       <a href="./acoes.html">Ações</a>
       <a href="./analise.html">Análises</a>
@@ -31,52 +31,30 @@
       <thead><tr><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody id="tb"></tbody>
     </table>
-    <div class="muted">Observação: dados são salvos no navegador (localStorage). O arquivo acoes.json é usado como semente inicial.</div>
+    <div class="muted">Dados salvos no navegador (localStorage). acoes.json é a semente inicial.</div>
   </div>
 
   <div class="footer">Desenvolvido por Marcos Garçon P de Oliveira</div>
 
   <script>
-    const LS = 'Acoes_MQ_01';
+    const LS='Acoes_MQ_01';
     async function seed(){
       if(localStorage.getItem(LS)) return JSON.parse(localStorage.getItem(LS));
-      try{
-        const r = await fetch('../Setor%20-XY/MQ_01/acoes.json'); const d = await r.json();
-        localStorage.setItem(LS, JSON.stringify(d)); return d;
-      }catch(e){ localStorage.setItem(LS, JSON.stringify([])); return []; }
+      try{ const r=await fetch('../Setor%20-XY/MQ_01/acoes.json'); const d=await r.json(); localStorage.setItem(LS, JSON.stringify(d)); return d; }
+      catch(e){ localStorage.setItem(LS,'[]'); return []; }
     }
-    let acoes = [];
+    let acoes=[];
     function render(){
-      const tb = document.getElementById('tb'); tb.innerHTML='';
-      acoes.forEach((a,i)=>{
-        tb.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td>${a.acao}</td><td>${a.responsavel}</td><td>${a.prazo||'-'}</td><td>${a.status}</td>
-            <td>
-              <button class="btn btn-warn" onclick="editar(${i})">Editar</button>
-              <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button>
-            </td>
-          </tr>`);
-      });
+      tb.innerHTML=''; acoes.forEach((a,i)=>tb.insertAdjacentHTML('beforeend',`
+        <tr><td>${a.acao}</td><td>${a.responsavel}</td><td>${a.prazo||'-'}</td><td>${a.status}</td>
+        <td><button class="btn btn-warn" onclick="editar(${i})">Editar</button> <button class="btn btn-danger" onclick="excluir(${i})">Excluir</button></td></tr>`));
     }
-    window.editar = (i)=>{
-      const a = acoes[i];
-      acao.value=a.acao; responsavel.value=a.responsavel; prazo.value=a.prazo||''; status.value=a.status||'Aberto';
-      salvar.onclick=()=>{
-        acoes[i]={acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value};
-        localStorage.setItem(LS, JSON.stringify(acoes)); render(); limpar();
-      };
-    };
-    window.excluir = (i)=>{ if(confirm('Excluir?')){ acoes.splice(i,1); localStorage.setItem(LS, JSON.stringify(acoes)); render(); } };
+    window.editar=i=>{const a=acoes[i]; acao.value=a.acao; responsavel.value=a.responsavel; prazo.value=a.prazo||''; status.value=a.status||'Aberto';
+      salvar.onclick=()=>{acoes[i]={acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value}; localStorage.setItem(LS, JSON.stringify(acoes)); render(); limpar();};};
+    window.excluir=i=>{ if(confirm('Excluir?')){ acoes.splice(i,1); localStorage.setItem(LS, JSON.stringify(acoes)); render(); } };
     function limpar(){ acao.value=''; responsavel.value=''; prazo.value=''; status.value='Aberto'; salvar.onclick=add; }
-    function add(){
-      if(acao.value && responsavel.value){
-        acoes.push({acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value||'Aberto'});
-        localStorage.setItem(LS, JSON.stringify(acoes)); render(); limpar();
-      }else alert('Preencha ação e responsável');
-    }
-    document.getElementById('limpar').onclick = limpar;
-    async function init(){ acoes = await seed(); render(); salvar.onclick=add; }
-    init();
+    function add(){ if(acao.value && responsavel.value){ acoes.push({acao:acao.value,responsavel:responsavel.value,prazo:prazo.value,status:status.value||'Aberto'}); localStorage.setItem(LS, JSON.stringify(acoes)); render(); limpar(); } else alert('Preencha ação e responsável'); }
+    document.getElementById('limpar').onclick=limpar;
+    (async()=>{acoes=await seed(); render(); salvar.onclick=add;})();
   </script>
 </body></html>
