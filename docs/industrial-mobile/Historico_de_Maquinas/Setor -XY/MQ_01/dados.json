@@ -1,0 +1,8 @@
+{
+  "maquina": "MQ_01",
+  "historico": [
+    { "data": "2026-02-17", "descricao": "Vazamento na válvula V123", "status": "Aberto", "prazo": "2026-02-20" },
+    { "data": "2026-02-16", "descricao": "Troca de sensor S-09", "status": "Fechado", "prazo": "2026-02-16" },
+    { "data": "2026-02-15", "descricao": "Ajuste de calibração", "status": "Fechado" }
+  ]
+}
